@@ -7,14 +7,13 @@ import { Database } from '@/lib/database.types';
 // This tells Next.js to render pages on demand
 export const dynamic = 'force-dynamic';
 
-// --- CHANGE HERE: Define a more explicit type for the page props ---
-interface EditPageProps {
-  params: {
-    id: string;
-  };
-}
+// --- CHANGE HERE: Use a more robust type definition for Page Props ---
+type Props = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
-export default async function EditNotePage({ params }: EditPageProps) {
+export default async function EditNotePage({ params }: Props) {
   const supabase = createClient();
   const { data: note } = await supabase
     .from('notes')
