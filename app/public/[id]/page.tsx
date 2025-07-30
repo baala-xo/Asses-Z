@@ -6,10 +6,13 @@ import { Database } from '@/lib/database.types';
 // This tells Next.js to render pages on demand
 export const dynamic = 'force-dynamic';
 
-// Define the type for a single note
-type Note = Database['public']['Tables']['notes']['Row'];
+// --- CHANGE HERE: Use a more robust type definition for Page Props ---
+type Props = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
-export default async function PublicNotePage({ params }: { params: { id: string } }) {
+export default async function PublicNotePage({ params }: Props) {
   // Create a generic Supabase client for unauthenticated access
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
