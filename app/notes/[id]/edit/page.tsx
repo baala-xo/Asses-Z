@@ -2,18 +2,12 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import EditNoteForm from './edit-form';
 import { decrypt } from '@/lib/encryption';
-import { Database } from '@/lib/database.types';
 
 // This tells Next.js to render pages on demand
 export const dynamic = 'force-dynamic';
 
-// --- CHANGE HERE: Use a more robust type definition for Page Props ---
-type Props = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default async function EditNotePage({ params }: Props) {
+// --- EMERGENCY FIX: Use a less strict type to bypass the build error ---
+export default async function EditNotePage({ params }: { params: { id: string } }) {
   const supabase = createClient();
   const { data: note } = await supabase
     .from('notes')
