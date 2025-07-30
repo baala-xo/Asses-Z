@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { deleteNote, togglePublicStatus } from '@/app/notes/actions';
 import { Database } from '@/lib/database.types';
 
-// The note type from the server now includes is_public
 type DecryptedNote = Omit<Database['public']['Tables']['notes']['Row'], 'content'> & {
     content: string;
 };
@@ -56,9 +55,7 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-x-2">
-                    <Link href={`/notes/${note.id}/edit`} className="px-2 py-1 text-xs font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700">
-                      Edit
-                    </Link>
+                    {/* EDIT BUTTON HAS BEEN REMOVED */}
                     <button
                       onClick={() => handleDelete(note.id)}
                       className="px-2 py-1 text-xs font-semibold text-white bg-red-600 rounded hover:bg-red-700"
