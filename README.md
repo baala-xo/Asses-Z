@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Features Checklist
+[x] Authentication: Users can sign in/out via Google OAuth. Routes are protected.
 
-## Getting Started
+[x] CRUD Operations:
 
-First, run the development server:
+[x] Create: Users can create new notes.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+[x] Read: Users can view a list of their notes.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[ ] Update: Users can edit their notes. (Temporarily disabled to resolve a build-specific type error during deployment).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+[x] Delete: Users can delete their notes.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+[x] Encryption: Note content is encrypted at rest in the database.
 
-## Learn More
+[x] Public Notes: Users can make notes public and share them via a unique URL.
 
-To learn more about Next.js, take a look at the following resources:
+[x] Deployment: The application is deployed and live on Vercel.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Encryption Technique and Flow
+To ensure data privacy, the content of each note is encrypted before it is stored in the database. This means that even if someone gained direct access to the database, the note content would be unreadable.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Technique Used: AES (Advanced Encryption Standard), a symmetric encryption algorithm, implemented via the crypto-js library.
 
-## Deploy on Vercel
+How it Works
+The encryption and decryption process is handled entirely on the server-side to protect the secret key.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Creating/Updating a Note:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+A user submits a note with a title and plain text content.
+
+The server receives the plain text.
+
+Before saving to the database, the server uses a secret key (stored only on the server) to encrypt the note's content.
+
+Only the encrypted text is stored in the Supabase database.
+
+Reading a Note:
+
+When a user requests their notes, the server fetches the encrypted content from the database.
+
+The server uses the same secret key to decrypt the content back into plain text.
+
+The decrypted, readable plain text is then sent to the user's browser to be displayed.
+
+Key Management
+The ENCRYPTION_SECRET_KEY is a 32-character random string that acts as the password for the encryption. It is stored securely as an environment variable:
+
+Locally in the .env.local file (which is not committed to Git).
+
+In production on the Vercel project settings.
+
+This ensures the key is never exposed in the client-side code or in the Git repository.
