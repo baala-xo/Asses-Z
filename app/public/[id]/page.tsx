@@ -2,50 +2,58 @@ import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 import { decrypt } from '@/lib/encryption';
 import { Database } from '@/lib/database.types';
+import Image from 'next/image';
 
-// This tells Next.js to render pages on demand
 export const dynamic = 'force-dynamic';
 
-// --- CHANGE HERE: Use a more robust type definition for Page Props ---
 type Props = {
   params: { id: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export default async function PublicNotePage({ params }: Props) {
-  // Create a generic Supabase client for unauthenticated access
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Fetch the note by its ID
-  // RLS Policy: This will only return a note if 'is_public' is true.
   const { data: note } = await supabase
     .from('notes')
     .select('*')
     .eq('id', params.id)
-    .eq('is_public', true) // Explicitly check for public status
+    .eq('is_public', true)
     .single();
 
-  // If the note doesn't exist or isn't public, show a 404 page
   if (!note) {
     notFound();
   }
 
-  // Decrypt the content before displaying it
-  const decryptedContent = note.content ? decrypt(note.content) : '';
+  // --- CHANGE HERE: Robustly process content based on type ---
+  let finalContent = note.content || '';
+  if (note.type === 'text' && note.content) {
+    try {
+      finalContent = decrypt(note.content);
+    } catch (e) {
+      console.error(`Failed to decrypt public note ID ${note.id}:`, e);
+    }
+  }
 
   return (
-    <div className="flex justify-center min-h-screen bg-gray-50 py-12">
-      <div className="w-full max-w-2xl p-8 bg-white rounded-lg shadow-md">
-        <h1 className="mb-4 text-3xl font-bold text-gray-900">{note.title}</h1>
-        <p className="mb-6 text-sm text-gray-500">
+    <div className="flex justify-center min-h-screen bg-background py-12">
+      <div className="w-full max-w-2xl p-8 bg-card border border-border rounded-lg shadow-md">
+        <h1 className="mb-4 text-3xl font-bold text-card-foreground">{note.title}</h1>
+        <p className="mb-6 text-sm text-muted-foreground">
           Published on: {new Date(note.created_at).toLocaleDateString()}
         </p>
         <div className="prose max-w-none">
-            {/* Using a div with whitespace-pre-wrap to render content with formatting */}
-            <div className="whitespace-pre-wrap text-gray-800">{decryptedContent}</div>
+          {/* Conditionally render image or text */}
+          {note.type === 'scribble' ? (
+            <div className="relative w-full mt-2 aspect-video bg-white rounded-md overflow-hidden">
+                <Image src={finalContent} alt={note.title || 'Scribble'} layout="fill" objectFit="contain" />
+            </div>
+          ) : (
+            <div className="whitespace-pre-wrap text-foreground">{finalContent}</div>
+          )}
         </div>
       </div>
     </div>

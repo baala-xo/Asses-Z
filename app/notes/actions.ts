@@ -83,4 +83,28 @@ export async function togglePublicStatus(noteId: number, currentState: boolean) 
   return { success: 'Note status updated.' };
 }
 
+export async function createScribbleNote(content: string, title: string) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
+  if (!user) {
+    return { error: 'You must be logged in to save a scribble.' };
+  }
+
+  // Note: We are not encrypting the scribble data URL as it's not plain text.
+  // For higher security, this could be encrypted, but it would require decryption on the client before rendering.
+  const { error } = await supabase.from('notes').insert({
+    title,
+    content, // The content is the base64 data URL from the canvas
+    user_id: user.id,
+    type: 'scribble', // Set the type to 'scribble'
+  });
+
+  if (error) {
+    console.error('Error creating scribble note:', error);
+    return { error: 'Failed to save scribble.' };
+  }
+
+  revalidatePath('/notes');
+  return { success: 'Scribble saved successfully.' };
+}

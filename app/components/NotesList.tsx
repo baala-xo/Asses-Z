@@ -2,7 +2,9 @@
 
 import { deleteNote, togglePublicStatus } from '@/app/notes/actions';
 import { Database } from '@/lib/database.types';
+import Image from 'next/image';
 
+// The note type from the server now includes 'type' and 'content' can be a data URL
 type DecryptedNote = Omit<Database['public']['Tables']['notes']['Row'], 'content'> & {
     content: string;
 };
@@ -32,7 +34,7 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
 
   return (
     <div className="mt-8">
-      <h2 className="text-xl font-semibold text-foreground">Your Notes</h2>
+      <h2 className="text-xl font-semibold text-foreground">Your Notes & Scribbles</h2>
       {notes && notes.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3">
           {notes.map((note) => (
@@ -40,7 +42,14 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
               {/* Note Body */}
               <div className="flex-grow">
                 <h3 className="text-lg font-bold text-card-foreground">{note.title}</h3>
-                <p className="mt-2 text-muted-foreground whitespace-pre-wrap">{note.content}</p>
+                {/* --- CHANGE HERE: Conditionally render text or image --- */}
+                {note.type === 'scribble' ? (
+                  <div className="relative w-full mt-2 aspect-video bg-white rounded-md overflow-hidden">
+                     <Image src={note.content} alt={note.title || 'Scribble'} layout="fill" objectFit="contain" />
+                  </div>
+                ) : (
+                  <p className="mt-2 text-muted-foreground whitespace-pre-wrap">{note.content}</p>
+                )}
               </div>
 
               {/* Note Footer */}
