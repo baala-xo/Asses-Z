@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   // if `code` is present, use it to exchange for a session
-  const next = searchParams.get('next') ?? '/'
+  const next = searchParams.get('next') ?? '/notes'
 
   if (code) {
     const cookieStore = cookies()

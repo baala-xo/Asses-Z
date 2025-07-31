@@ -1,53 +1,33 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import { decrypt } from '@/lib/encryption';
-import LogoutButton from './components/LogoutButton';
-import CreateNoteForm from './components/CreateNoteForm';
-import NotesList from './components/NotesList';
+import Link from 'next/link';
 
-// This tells Next.js to always render this page dynamically
-export const dynamic = 'force-dynamic';
-
-export default async function HomePage() {
-  const supabase = createClient();
-
-  // 1. Check for active user session
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    // If no user, redirect to the login page
-    return redirect('/login');
-  }
-
-  // 2. Fetch all notes for the user from the database
-  const { data: notes } = await supabase
-    .from('notes')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  // 3. Decrypt the content of each note securely on the server
-  const decryptedNotes = notes?.map(note => ({
-    ...note,
-    content: note.content ? decrypt(note.content) : '',
-  })) || [];
-
-  // 4. Render the page structure and pass data to client components
+export default function LandingPage() {
   return (
-    <div className="flex flex-col items-center min-h-screen p-4 md:p-8">
-      <div className="w-full max-w-4xl">
-        <header className="flex items-center justify-between mb-8">
-          <div>
-            {/* --- CHANGES HERE --- */}
-            <h1 className="text-2xl font-bold text-white">My Notes</h1>
-            <p className="text-sm text-gray-300">Welcome, {user.email}</p>
-          </div>
-          <LogoutButton />
-        </header>
-        <main>
-          <CreateNoteForm />
-          {/* Pass the prepared, decrypted notes to the list component */}
-          <NotesList notes={decryptedNotes} />
-        </main>
-      </div>
+    <div className="flex flex-col items-center justify-center min-h-screen text-center bg-background text-foreground p-4">
+      <header className="mb-8">
+        <h1 className="text-5xl font-bold">Welcome to Your Notes App</h1>
+        <p className="mt-4 text-lg text-muted-foreground">
+          The simple, secure, and elegant way to keep track of your thoughts.
+        </p>
+      </header>
+      <main className="mb-8">
+        <div className="p-8 border rounded-lg bg-card border-border">
+          <h2 className="text-2xl font-semibold text-card-foreground">Features You'll Love</h2>
+          <ul className="mt-4 space-y-2 text-left list-disc list-inside text-muted-foreground">
+            <li>End-to-End Encryption for your privacy.</li>
+            <li>Create, read, and delete notes with ease.</li>
+            <li>Share notes securely with a public link.</li>
+            <li>Clean and modern user interface.</li>
+          </ul>
+        </div>
+      </main>
+      <footer>
+        <Link
+          href="/notes"
+          className="px-8 py-4 text-lg font-bold rounded-md text-primary-foreground bg-primary hover:bg-primary/90"
+        >
+          Try Now
+        </Link>
+      </footer>
     </div>
   );
 }

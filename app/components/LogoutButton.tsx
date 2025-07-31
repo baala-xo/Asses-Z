@@ -1,5 +1,3 @@
-// app/components/LogoutButton.tsx
-
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
@@ -18,7 +16,7 @@ export default function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="px-4 py-2 font-bold text-white bg-red-500 rounded hover:bg-red-700"
+      className="px-4 py-2 font-bold text-destructive-foreground bg-destructive rounded-md hover:bg-destructive/90"
     >
       Logout
     </button>

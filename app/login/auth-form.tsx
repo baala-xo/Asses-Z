@@ -1,5 +1,3 @@
-// app/login/auth-form.tsx
-
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
@@ -19,7 +17,7 @@ export function AuthForm() {
   return (
     <button
       onClick={handleGoogleLogin}
-      className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-700"
+      className="w-full px-4 py-2 font-bold rounded-md text-primary-foreground bg-primary hover:bg-primary/90"
     >
       Sign In with Google
     </button>

@@ -32,7 +32,7 @@ export async function createNote(formData: FormData) {
     return { error: 'Failed to create note.' };
   }
 
-  revalidatePath('/');
+  revalidatePath('/notes');
   return { success: 'Note created successfully.' };
 }
 
@@ -54,7 +54,7 @@ export async function deleteNote(noteId: number) {
     return { error: 'Failed to delete note.' };
   }
 
-  revalidatePath('/');
+  revalidatePath('/notes');
   return { success: 'Note deleted successfully.' };
 }
 
@@ -79,6 +79,8 @@ export async function togglePublicStatus(noteId: number, currentState: boolean) 
     return { error: 'Failed to update note status.' };
   }
 
-  revalidatePath('/');
+  revalidatePath('notes');
   return { success: 'Note status updated.' };
 }
+
+

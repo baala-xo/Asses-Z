@@ -10,7 +10,7 @@ export default function CreateNoteForm() {
     // We clear the form on the client side for a faster UI response
     const currentForm = formRef.current;
     if (currentForm) {
-      // Manually get data before reset
+      // Manually get data before reset to check if form is filled
       const title = (currentForm.elements.namedItem('title') as HTMLInputElement).value;
       const content = (currentForm.elements.namedItem('content') as HTMLTextAreaElement).value;
 
@@ -22,7 +22,7 @@ export default function CreateNoteForm() {
     const result = await createNote(formData);
     if (result?.error) {
       alert(result.error);
-      // Note: In a real app, you might want to restore form content on error
+      // Note: In a real app, you might want to restore the form data upon error.
     }
   };
 
@@ -30,11 +30,11 @@ export default function CreateNoteForm() {
     <form
       ref={formRef}
       action={handleCreateNote}
-      className="p-6 mb-8 space-y-4 bg-white border border-gray-200 rounded-lg"
+      className="p-6 mb-8 space-y-4 bg-card border border-border rounded-lg"
     >
-      <h2 className="text-xl font-semibold text-black">Create a New Note</h2>
+      <h2 className="text-xl font-semibold text-card-foreground">Create a New Note</h2>
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="title" className="block text-sm font-medium text-muted-foreground">
           Title
         </label>
         <input
@@ -42,12 +42,11 @@ export default function CreateNoteForm() {
           name="title"
           id="title"
           required
-          // --- CHANGE HERE ---
-          className="block w-full px-3 py-2 mt-1 text-black bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          className="block w-full px-3 py-2 mt-1 bg-input border-border rounded-md shadow-sm text-foreground focus:ring-ring focus:border-primary"
         />
       </div>
       <div>
-        <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="content" className="block text-sm font-medium text-muted-foreground">
           Content
         </label>
         <textarea
@@ -55,13 +54,12 @@ export default function CreateNoteForm() {
           id="content"
           rows={4}
           required
-          // --- CHANGE HERE ---
-          className="block w-full px-3 py-2 mt-1 text-black bg-white border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          className="block w-full px-3 py-2 mt-1 bg-input border-border rounded-md shadow-sm text-foreground focus:ring-ring focus:border-primary"
         ></textarea>
       </div>
       <button
         type="submit"
-        className="w-full px-4 py-2 font-bold text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+        className="w-full px-4 py-2 font-bold text-primary-foreground bg-primary rounded-md hover:bg-primary/90"
       >
         Create Note
       </button>

@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { deleteNote, togglePublicStatus } from '@/app/notes/actions';
 import { Database } from '@/lib/database.types';
 
@@ -33,43 +32,42 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
 
   return (
     <div className="mt-8">
-      <h2 className="text-xl font-semibold text-white">Your Notes</h2>
+      <h2 className="text-xl font-semibold text-foreground">Your Notes</h2>
       {notes && notes.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3">
           {notes.map((note) => (
-            <div key={note.id} className="flex flex-col p-4 bg-white border rounded-lg shadow">
+            <div key={note.id} className="flex flex-col p-4 bg-card border border-border rounded-lg shadow">
               {/* Note Body */}
               <div className="flex-grow">
-                <h3 className="text-lg font-bold text-black">{note.title}</h3>
-                <p className="mt-2 text-gray-700 whitespace-pre-wrap">{note.content}</p>
+                <h3 className="text-lg font-bold text-card-foreground">{note.title}</h3>
+                <p className="mt-2 text-muted-foreground whitespace-pre-wrap">{note.content}</p>
               </div>
 
               {/* Note Footer */}
-              <div className="pt-4 mt-4 border-t border-gray-200">
+              <div className="pt-4 mt-4 border-t border-border">
                 <div className="flex items-center justify-between mb-3">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${note.is_public ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${note.is_public ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground'}`}>
                         {note.is_public ? 'Public' : 'Private'}
                     </span>
-                    <p className="text-xs text-gray-400">{new Date(note.created_at).toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(note.created_at).toLocaleString()}</p>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-x-2">
-                    {/* EDIT BUTTON HAS BEEN REMOVED */}
                     <button
                       onClick={() => handleDelete(note.id)}
-                      className="px-2 py-1 text-xs font-semibold text-white bg-red-600 rounded hover:bg-red-700"
+                      className="px-2 py-1 text-xs font-semibold rounded text-destructive-foreground bg-destructive hover:bg-destructive/90"
                     >
                       Delete
                     </button>
                   </div>
                   <div className="flex items-center gap-x-2">
                     {note.is_public && (
-                        <button onClick={() => handleCopyLink(note.id)} className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded hover:bg-blue-200">
+                        <button onClick={() => handleCopyLink(note.id)} className="px-2 py-1 text-xs rounded text-secondary-foreground bg-secondary hover:bg-secondary/90">
                             Copy Link
                         </button>
                     )}
-                    <button onClick={() => handleTogglePublic(note.id, note.is_public || false)} className="px-2 py-1 text-xs text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+                    <button onClick={() => handleTogglePublic(note.id, note.is_public || false)} className="px-2 py-1 text-xs rounded text-muted-foreground bg-muted hover:bg-muted/90">
                       {note.is_public ? 'Make Private' : 'Make Public'}
                     </button>
                   </div>
@@ -79,7 +77,7 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
           ))}
         </div>
       ) : (
-        <p className="mt-4 text-gray-500">You have no notes yet. Create one above!</p>
+        <p className="mt-4 text-muted-foreground">You have no notes yet. Create one above!</p>
       )}
     </div>
   );
