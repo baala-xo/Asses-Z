@@ -44,7 +44,7 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        showPopup('Public link copied to clipboard!');
+        showPopup('Public link copied to clipboard! share it with your friends now');
       })
       .catch((err) => {
         console.error('Failed to copy link: ', err);
