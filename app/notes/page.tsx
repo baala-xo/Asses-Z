@@ -2,9 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { decrypt } from '@/lib/encryption';
 import LogoutButton from '../components/LogoutButton';
-import CreateNoteForm from '../components/CreateNoteForm';
 import NotesList from '../components/NotesList';
-import ScribblePad from '../components/Scribblepad';
+import NoteCreationTabs from '../components/NoteCreationTabs'; // 1. Import the new component
 
 export const dynamic = 'force-dynamic';
 
@@ -20,17 +19,13 @@ export default async function NotesPage() {
     .select('*')
     .order('created_at', { ascending: false });
 
-  // --- CHANGE HERE: Add a try-catch block for robust decryption ---
   const processedNotes = notes?.map(note => {
     let content = note.content || '';
     if (note.type === 'text' && note.content) {
       try {
-        // Attempt to decrypt only text notes
         content = decrypt(note.content);
       } catch (e) {
-        // If decryption fails, log the error and use the raw content
         console.error(`Failed to decrypt note ID ${note.id}:`, e);
-        // The content remains the original, un-decrypted content
       }
     }
     return { ...note, content };
@@ -49,8 +44,8 @@ export default async function NotesPage() {
           <LogoutButton />
         </header>
         <main>
-          <CreateNoteForm />
-          <ScribblePad />
+          {/* 2. Replace the old forms with the new tab component */}
+          <NoteCreationTabs />
           <NotesList notes={processedNotes} />
         </main>
       </div>

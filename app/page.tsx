@@ -21,7 +21,7 @@ export default function LandingPage() {
           </div>
 
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-6">
-            Welcome to Your Notes App
+            Welcome to note - Z
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             The simple, secure, and elegant way to keep track of your thoughts.
@@ -94,7 +94,7 @@ export default function LandingPage() {
               <span className="relative z-10">Try Now</span>
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
             </Link>
-            <p className="text-sm text-muted-foreground">No signup required • Start organizing your thoughts today</p>
+            <p className="text-sm text-muted-foreground"> Accelerate or Die</p>
           </div>
         </footer>
       </div>
