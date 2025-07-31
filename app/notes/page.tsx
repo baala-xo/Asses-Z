@@ -4,7 +4,7 @@ import { decrypt } from '@/lib/encryption';
 import LogoutButton from '../components/LogoutButton';
 import CreateNoteForm from '../components/CreateNoteForm';
 import NotesList from '../components/NotesList';
-import ScribblePad from '../components/ScribblePad';
+import ScribblePad from '../components/Scribblepad';
 
 export const dynamic = 'force-dynamic';
 
