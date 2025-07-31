@@ -52,13 +52,13 @@ export default function LandingPage() {
                     <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <FileText className="w-3 h-3 text-primary" />
                     </div>
-                    <span className="text-muted-foreground">Create, read, and delete notes with ease.</span>
+                    <span className="text-muted-foreground">Create, read, and delete notes & Scribbles with ease.</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Share2 className="w-3 h-3 text-primary" />
                     </div>
-                    <span className="text-muted-foreground">Share notes securely with a public link.</span>
+                    <span className="text-muted-foreground">Share notes & Scribbles securely with a public link.</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">

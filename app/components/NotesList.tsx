@@ -1,43 +1,59 @@
-"use client"
+'use client';
 
-import { deleteNote, togglePublicStatus } from "@/app/notes/actions"
-import type { Database } from "@/lib/database.types"
-import Image from "next/image"
-import { Trash2, Globe, Lock, Copy, Calendar, FileText, Palette } from "lucide-react"
+import { useState } from 'react';
+import { deleteNote, togglePublicStatus } from '@/app/notes/actions';
+import type { Database } from '@/lib/database.types';
+import Image from 'next/image';
+import { Trash2, Globe, Lock, Copy, Calendar, FileText, Palette } from 'lucide-react';
 
 // The note type from the server now includes 'type' and 'content' can be a data URL
-type DecryptedNote = Omit<Database["public"]["Tables"]["notes"]["Row"], "content"> & {
-  content: string
-}
+type DecryptedNote = Omit<Database['public']['Tables']['notes']['Row'], 'content'> & {
+  content: string;
+};
 
 export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
+  // State to manage the popup message
+  const [popupMessage, setPopupMessage] = useState<string | null>(null);
+  // State to track which note is currently being updated
+  const [loadingNoteId, setLoadingNoteId] = useState<number | null>(null);
+
+  const showPopup = (message: string) => {
+    setPopupMessage(message);
+    setTimeout(() => {
+      setPopupMessage(null);
+    }, 3000);
+  };
+
   const handleDelete = async (noteId: number) => {
-    if (window.confirm("Are you sure you want to delete this note?")) {
-      const result = await deleteNote(noteId)
+    if (window.confirm('Are you sure you want to delete this note?')) {
+      const result = await deleteNote(noteId);
       if (result?.error) {
-        alert(`Error: ${result.error}`)
+        showPopup(`Error: ${result.error}`);
       }
     }
-  }
+  };
 
   const handleTogglePublic = async (noteId: number, currentState: boolean) => {
-    await togglePublicStatus(noteId, currentState)
-  }
+    setLoadingNoteId(noteId); // Start loading
+    await togglePublicStatus(noteId, currentState);
+    setLoadingNoteId(null); // Stop loading
+  };
 
   const handleCopyLink = (noteId: number) => {
-    const url = `${window.location.origin}/public/${noteId}`
+    const url = `${window.location.origin}/public/${noteId}`;
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        alert("Public link copied to clipboard!")
+        showPopup('Public link copied to clipboard!');
       })
       .catch((err) => {
-        console.error("Failed to copy link: ", err)
-      })
-  }
+        console.error('Failed to copy link: ', err);
+        showPopup('Failed to copy link.');
+      });
+  };
 
   return (
-    <div className="mt-12">
+    <div className="mt-12 relative">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
           <FileText className="w-4 h-4 text-primary" />
@@ -45,7 +61,7 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
         <h2 className="text-2xl font-bold text-foreground">Your Notes & Scribbles</h2>
         {notes && notes.length > 0 && (
           <span className="px-3 py-1 text-sm font-medium rounded-full bg-muted text-muted-foreground">
-            {notes.length} {notes.length === 1 ? "note" : "notes"}
+            {notes.length} {notes.length === 1 ? 'note' : 'notes'}
           </span>
         )}
       </div>
@@ -62,7 +78,7 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      {note.type === "scribble" ? (
+                      {note.type === 'scribble' ? (
                         <Palette className="w-3 h-3 text-primary" />
                       ) : (
                         <FileText className="w-3 h-3 text-primary" />
@@ -75,8 +91,8 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors ${
                         note.is_public
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                          : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                       }`}
                     >
                       {note.is_public ? (
@@ -96,11 +112,11 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
 
                 {/* Note Content */}
                 <div className="mb-4">
-                  {note.type === "scribble" ? (
+                  {note.type === 'scribble' ? (
                     <div className="relative w-full aspect-video bg-white rounded-lg overflow-hidden border border-border/30">
                       <Image
-                        src={note.content || "/placeholder.svg"}
-                        alt={note.title || "Scribble"}
+                        src={note.content || '/placeholder.svg'}
+                        alt={note.title || 'Scribble'}
                         fill
                         className="object-contain"
                       />
@@ -110,7 +126,7 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
                       <p className="text-muted-foreground whitespace-pre-wrap line-clamp-4 text-sm leading-relaxed">
                         {note.content}
                       </p>
-                      {note.content.length > 200 && (
+                      {note.content && note.content.length > 200 && (
                         <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-card to-transparent"></div>
                       )}
                     </div>
@@ -148,9 +164,15 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
 
                     <button
                       onClick={() => handleTogglePublic(note.id, note.is_public || false)}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                      disabled={loadingNoteId === note.id}
+                      className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {note.is_public ? (
+                      {loadingNoteId === note.id ? (
+                        <svg className="animate-spin h-3.5 w-3.5 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : note.is_public ? (
                         <>
                           <Lock className="w-3.5 h-3.5" />
                           Make Private
@@ -182,6 +204,13 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
           </p>
         </div>
       )}
+
+      {/* Custom Popup component */}
+      {popupMessage && (
+        <div className="fixed bottom-5 right-5 bg-accent text-accent-foreground py-2 px-4 rounded-lg shadow-lg transition-transform transform animate-in fade-in slide-in-from-bottom">
+          <p>{popupMessage}</p>
+        </div>
+      )}
     </div>
-  )
+  );
 }

@@ -19,8 +19,12 @@ const firaCode = Fira_Code({
 
 
 export const metadata: Metadata = {
-  title: "Notes App",
+  title: "note - Z",
   description: "Create and share your notes and scribbles.",
+   icons: {
+    icon: '/favicon.ico', // Standard favicon
+    apple: '/apple-touch-icon.png', // For Apple devices
+  },
 };
 
 export default function RootLayout({

@@ -36,9 +36,9 @@ export default async function NotesPage() {
       <div className="w-full max-w-4xl">
         <header className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">My Notes</h1>
+            <h1 className="text-2xl font-bold text-foreground">note - Z</h1>
             <p className="text-sm text-muted-foreground">
-              Welcome, {user.user_metadata.full_name || user.email}
+              Welcome, {user.user_metadata.full_name || user.email} 💜
             </p>
           </div>
           <LogoutButton />
