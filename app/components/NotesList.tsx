@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { deleteNote, togglePublicStatus } from '@/app/notes/actions';
 import type { Database } from '@/lib/database.types';
 import Image from 'next/image';
-import { Trash2, Globe, Lock, Copy, Calendar, FileText, Palette } from 'lucide-react';
+import { Trash2, Globe, Lock, Copy, Calendar, FileText, Palette, Wand2 } from 'lucide-react';
+import SummaryModal from './SummaryModal'; // Import the summary modal
 
 // The note type from the server now includes 'type' and 'content' can be a data URL
 type DecryptedNote = Omit<Database['public']['Tables']['notes']['Row'], 'content'> & {
@@ -12,11 +13,14 @@ type DecryptedNote = Omit<Database['public']['Tables']['notes']['Row'], 'content
 };
 
 export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
-  // State to manage the popup message
+  // State for custom pop-up notifications
   const [popupMessage, setPopupMessage] = useState<string | null>(null);
-  // State to track which note is currently being updated
+  // State for loading indicators on buttons
   const [loadingNoteId, setLoadingNoteId] = useState<number | null>(null);
+  // State to manage the AI summary modal
+  const [selectedNoteForSummary, setSelectedNoteForSummary] = useState<DecryptedNote | null>(null);
 
+  // Helper function to show a popup message for 3 seconds
   const showPopup = (message: string) => {
     setPopupMessage(message);
     setTimeout(() => {
@@ -44,7 +48,7 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        showPopup('Public link copied to clipboard! share it with your friends now');
+        showPopup('Public link copied to clipboard!');
       })
       .catch((err) => {
         console.error('Failed to copy link: ', err);
@@ -96,15 +100,9 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
                       }`}
                     >
                       {note.is_public ? (
-                        <>
-                          <Globe className="w-3 h-3" />
-                          Public
-                        </>
+                        <><Globe className="w-3 h-3" /> Public</>
                       ) : (
-                        <>
-                          <Lock className="w-3 h-3" />
-                          Private
-                        </>
+                        <><Lock className="w-3 h-3" /> Private</>
                       )}
                     </span>
                   </div>
@@ -152,6 +150,16 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
                   </button>
 
                   <div className="flex items-center gap-2">
+                    {note.type === 'text' && (
+                      <button
+                        onClick={() => setSelectedNoteForSummary(note)}
+                        className="inline-flex items-center justify-center p-2 text-sm font-medium rounded-lg text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:hover:text-purple-300 dark:hover:bg-purple-900/20 transition-colors"
+                        title="Summarize with AI"
+                      >
+                        <Wand2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
                     {note.is_public && (
                       <button
                         onClick={() => handleCopyLink(note.id)}
@@ -173,15 +181,9 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                       ) : note.is_public ? (
-                        <>
-                          <Lock className="w-3.5 h-3.5" />
-                          Make Private
-                        </>
+                        <><Lock className="w-3.5 h-3.5" /> Make Private</>
                       ) : (
-                        <>
-                          <Globe className="w-3.5 h-3.5" />
-                          Make Public
-                        </>
+                        <><Globe className="w-3.5 h-3.5" /> Make Public</>
                       )}
                     </button>
                   </div>
@@ -205,11 +207,20 @@ export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
         </div>
       )}
 
-      {/* Custom Popup component */}
+      {/* Custom Popup component for copy link notifications */}
       {popupMessage && (
         <div className="fixed bottom-5 right-5 bg-accent text-accent-foreground py-2 px-4 rounded-lg shadow-lg transition-transform transform animate-in fade-in slide-in-from-bottom">
           <p>{popupMessage}</p>
         </div>
+      )}
+
+      {/* Render the Summary Modal when a note is selected */}
+      {selectedNoteForSummary && (
+        <SummaryModal
+          noteContent={selectedNoteForSummary.content}
+          noteTitle={selectedNoteForSummary.title || 'Note'}
+          onClose={() => setSelectedNoteForSummary(null)}
+        />
       )}
     </div>
   );

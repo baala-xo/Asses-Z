@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileText, Shield, Share2, Sparkles } from "lucide-react"
+import { FileText, Shield, Share2, Sparkles,Wand2 } from "lucide-react"
 
 export default function LandingPage() {
   return (
@@ -54,6 +54,10 @@ export default function LandingPage() {
                     </div>
                     <span className="text-muted-foreground">Create, read, and delete notes & Scribbles with ease.</span>
                   </li>
+                  <li className="flex items-center gap-2">
+              <Wand2 className="w-4 h-4 text-primary" />
+              <span>Summarize notes with a single click using AI.</span>
+            </li>
                   <li className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Share2 className="w-3 h-3 text-primary" />

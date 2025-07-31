@@ -108,3 +108,58 @@ export async function createScribbleNote(content: string, title: string) {
   revalidatePath('/notes');
   return { success: 'Scribble saved successfully.' };
 }
+
+
+export async function summarizeNote(content: string) {
+  const apiKey = process.env.TOGETHER_AI_API_KEY;
+  if (!apiKey) {
+    return { error: 'AI API key is not configured.' };
+  }
+
+  if (!content || content.trim().length < 50) {
+      return { error: 'Note is too short to summarize.' };
+  }
+
+  try {
+    const response = await fetch('https://api.together.xyz/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert summarizer. Provide a concise summary of the following text.',
+          },
+          {
+            role: 'user',
+            content: `Please summarize this note:\n\n${content}`,
+          },
+        ],
+        max_tokens: 150, // Limit the length of the summary
+      }),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error('Together AI API Error:', errorBody);
+      return { error: `Failed to get summary. Status: ${response.status}` };
+    }
+
+    const result = await response.json();
+    const summary = result.choices[0]?.message?.content;
+
+    if (!summary) {
+        return { error: 'Could not extract summary from AI response.' };
+    }
+
+    return { summary };
+
+  } catch (error) {
+    console.error('Error summarizing note:', error);
+    return { error: 'An unexpected error occurred while summarizing.' };
+  }
+}

@@ -1,53 +1,80 @@
-Features Checklist
-[x] Authentication: Users can sign in/out via Google OAuth. Routes are protected.
+# note - Z - A Full-Stack Next.js Application
 
-[x] CRUD Operations:
+This is a modern, full-stack notes application built with Next.js and Supabase. It allows users to securely create, manage, and share text notes and hand-drawn scribbles. The application features a clean, themed UI with a focus on security and user experience.
 
-[x] Create: Users can create new notes.
+**Live Application:** [https://asses-z.vercel.app/](https://asses-z.vercel.app/)
 
-[x] Read: Users can view a list of their notes.
+---
 
-[ ] Update: Users can edit their notes. (Temporarily disabled to resolve a build-specific type error during deployment).
+## Features
 
-[x] Delete: Users can delete their notes.
+- **User Authentication**: Secure sign-in with Google OAuth.
+- **Note Creation**: Users can create both standard text notes and hand-drawn scribbles.
+- **AI Summarization**: Instantly summarize long text notes using the Mistral AI model.
+- **CRUD Operations**: Full Create, Read, and Delete functionality for all notes.
+- **End-to-End Encryption**: Text note content is encrypted on the server before being stored, ensuring user privacy.
+- **Public Sharing**: Users can make any note public and share it via a unique, read-only link.
+- **Themed UI**: A modern and consistent UI built with a custom theme using Tailwind CSS.
+- **Custom Fonts**: Uses "Architect's Daughter" for a unique, handwritten feel.
 
-[x] Encryption: Note content is encrypted at rest in the database.
+---
 
-[x] Public Notes: Users can make notes public and share them via a unique URL.
+## Tech Stack & Libraries
 
-[x] Deployment: The application is deployed and live on Vercel.
+This project was built using a modern, full-stack TypeScript environment.
 
-Encryption Technique and Flow
-To ensure data privacy, the content of each note is encrypted before it is stored in the database. This means that even if someone gained direct access to the database, the note content would be unreadable.
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Backend & Database**: [Supabase](https://supabase.io/) (PostgreSQL, Auth, Row Level Security)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) - with a custom theme using TweakCN [a no code theme editor] (https://tweakcn.com/)
+- **Encryption**: [crypto-js](https://github.com/brix/crypto-js) for AES encryption
+- **UI Components**: [Lucide React](https://lucide.dev/) for icons
 
-Technique Used: AES (Advanced Encryption Standard), a symmetric encryption algorithm, implemented via the crypto-js library.
+---
 
-How it Works
-The encryption and decryption process is handled entirely on the server-side to protect the secret key.
+## Encryption Flow
 
-Creating/Updating a Note:
+Security is a core feature of this application. All text-based notes are encrypted to protect user privacy.
 
-A user submits a note with a title and plain text content.
+- **Technique**: The application uses **AES (Advanced Encryption Standard)** for symmetric encryption.
+- **Process**:
+  1.  When a user creates or updates a text note, the content is sent to the server.
+  2.  On the server, the content is encrypted using a secret key that is stored securely as an environment variable.
+  3.  Only the **encrypted text** is ever saved to the database.
+  4.  When a user views their notes, the encrypted text is fetched from the database, decrypted on the server, and then the readable content is sent to the browser.
+- **Note**: Scribble notes (which are image data) are not encrypted in the current version to maintain performance.
 
-The server receives the plain text.
+---
 
-Before saving to the database, the server uses a secret key (stored only on the server) to encrypt the note's content.
+## Getting Started Locally
 
-Only the encrypted text is stored in the Supabase database.
+To run this project on your local machine:
 
-Reading a Note:
+1.  **Clone the repository:**
 
-When a user requests their notes, the server fetches the encrypted content from the database.
+    ```bash
+    git clone [your-repo-link]
+    cd [your-repo-name]
+    ```
 
-The server uses the same secret key to decrypt the content back into plain text.
+2.  **Install dependencies:**
 
-The decrypted, readable plain text is then sent to the user's browser to be displayed.
+    ```bash
+    npm install
+    ```
 
-Key Management
-The ENCRYPTION_SECRET_KEY is a 32-character random string that acts as the password for the encryption. It is stored securely as an environment variable:
+3.  **Set up environment variables:**
 
-Locally in the .env.local file (which is not committed to Git).
+    - Create a file named `.env.local` in the root of the project.
+    - Add your Supabase URL, Anon Key, and a custom Encryption Key:
+      ```ini
+      NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+      NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+      ENCRYPTION_SECRET_KEY=YOUR_32_CHARACTER_SECRET_KEY
+      ```
 
-In production on the Vercel project settings.
+4.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
 
-This ensures the key is never exposed in the client-side code or in the Git repository.
+The application will be available at `http://localhost:3000`.
