@@ -1,93 +1,187 @@
-'use client';
+"use client"
 
-import { deleteNote, togglePublicStatus } from '@/app/notes/actions';
-import { Database } from '@/lib/database.types';
-import Image from 'next/image';
+import { deleteNote, togglePublicStatus } from "@/app/notes/actions"
+import type { Database } from "@/lib/database.types"
+import Image from "next/image"
+import { Trash2, Globe, Lock, Copy, Calendar, FileText, Palette } from "lucide-react"
 
 // The note type from the server now includes 'type' and 'content' can be a data URL
-type DecryptedNote = Omit<Database['public']['Tables']['notes']['Row'], 'content'> & {
-    content: string;
-};
+type DecryptedNote = Omit<Database["public"]["Tables"]["notes"]["Row"], "content"> & {
+  content: string
+}
 
 export default function NotesList({ notes }: { notes: DecryptedNote[] }) {
   const handleDelete = async (noteId: number) => {
-    if (window.confirm('Are you sure you want to delete this note?')) {
-      const result = await deleteNote(noteId);
+    if (window.confirm("Are you sure you want to delete this note?")) {
+      const result = await deleteNote(noteId)
       if (result?.error) {
-        alert(`Error: ${result.error}`);
+        alert(`Error: ${result.error}`)
       }
     }
-  };
+  }
 
   const handleTogglePublic = async (noteId: number, currentState: boolean) => {
-    await togglePublicStatus(noteId, currentState);
-  };
+    await togglePublicStatus(noteId, currentState)
+  }
 
   const handleCopyLink = (noteId: number) => {
-    const url = `${window.location.origin}/public/${noteId}`;
-    navigator.clipboard.writeText(url).then(() => {
-      alert('Public link copied to clipboard!');
-    }).catch(err => {
-      console.error('Failed to copy link: ', err);
-    });
-  };
+    const url = `${window.location.origin}/public/${noteId}`
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        alert("Public link copied to clipboard!")
+      })
+      .catch((err) => {
+        console.error("Failed to copy link: ", err)
+      })
+  }
 
   return (
-    <div className="mt-8">
-      <h2 className="text-xl font-semibold text-foreground">Your Notes & Scribbles</h2>
+    <div className="mt-12">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+          <FileText className="w-4 h-4 text-primary" />
+        </div>
+        <h2 className="text-2xl font-bold text-foreground">Your Notes & Scribbles</h2>
+        {notes && notes.length > 0 && (
+          <span className="px-3 py-1 text-sm font-medium rounded-full bg-muted text-muted-foreground">
+            {notes.length} {notes.length === 1 ? "note" : "notes"}
+          </span>
+        )}
+      </div>
+
       {notes && notes.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {notes.map((note) => (
-            <div key={note.id} className="flex flex-col p-4 bg-card border border-border rounded-lg shadow">
-              {/* Note Body */}
-              <div className="flex-grow">
-                <h3 className="text-lg font-bold text-card-foreground">{note.title}</h3>
-                {/* --- CHANGE HERE: Conditionally render text or image --- */}
-                {note.type === 'scribble' ? (
-                  <div className="relative w-full mt-2 aspect-video bg-white rounded-md overflow-hidden">
-                     <Image src={note.content} alt={note.title || 'Scribble'} layout="fill" objectFit="contain" />
+            <div
+              key={note.id}
+              className="group relative flex flex-col bg-card border border-border/50 rounded-xl shadow-sm hover:shadow-lg hover:border-border transition-all duration-200 overflow-hidden"
+            >
+              {/* Note Header */}
+              <div className="p-6 pb-4">
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      {note.type === "scribble" ? (
+                        <Palette className="w-3 h-3 text-primary" />
+                      ) : (
+                        <FileText className="w-3 h-3 text-primary" />
+                      )}
+                    </div>
+                    <h3 className="text-lg font-semibold text-card-foreground truncate">{note.title}</h3>
                   </div>
-                ) : (
-                  <p className="mt-2 text-muted-foreground whitespace-pre-wrap">{note.content}</p>
-                )}
-              </div>
 
-              {/* Note Footer */}
-              <div className="pt-4 mt-4 border-t border-border">
-                <div className="flex items-center justify-between mb-3">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${note.is_public ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground'}`}>
-                        {note.is_public ? 'Public' : 'Private'}
-                    </span>
-                    <p className="text-xs text-muted-foreground">{new Date(note.created_at).toLocaleString()}</p>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-x-2">
-                    <button
-                      onClick={() => handleDelete(note.id)}
-                      className="px-2 py-1 text-xs font-semibold rounded text-destructive-foreground bg-destructive hover:bg-destructive/90"
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors ${
+                        note.is_public
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                      }`}
                     >
-                      Delete
-                    </button>
+                      {note.is_public ? (
+                        <>
+                          <Globe className="w-3 h-3" />
+                          Public
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-3 h-3" />
+                          Private
+                        </>
+                      )}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-x-2">
+                </div>
+
+                {/* Note Content */}
+                <div className="mb-4">
+                  {note.type === "scribble" ? (
+                    <div className="relative w-full aspect-video bg-white rounded-lg overflow-hidden border border-border/30">
+                      <Image
+                        src={note.content || "/placeholder.svg"}
+                        alt={note.title || "Scribble"}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <p className="text-muted-foreground whitespace-pre-wrap line-clamp-4 text-sm leading-relaxed">
+                        {note.content}
+                      </p>
+                      {note.content.length > 200 && (
+                        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-card to-transparent"></div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Timestamp */}
+                <div className="flex items-center gap-1 text-xs text-muted-foreground mb-4">
+                  <Calendar className="w-3 h-3" />
+                  {new Date(note.created_at).toLocaleString()}
+                </div>
+              </div>
+
+              {/* Note Actions */}
+              <div className="px-6 pb-6 mt-auto">
+                <div className="flex items-center justify-between gap-2">
+                  <button
+                    onClick={() => handleDelete(note.id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Delete
+                  </button>
+
+                  <div className="flex items-center gap-2">
                     {note.is_public && (
-                        <button onClick={() => handleCopyLink(note.id)} className="px-2 py-1 text-xs rounded text-secondary-foreground bg-secondary hover:bg-secondary/90">
-                            Copy Link
-                        </button>
+                      <button
+                        onClick={() => handleCopyLink(note.id)}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20 transition-colors"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        Copy Link
+                      </button>
                     )}
-                    <button onClick={() => handleTogglePublic(note.id, note.is_public || false)} className="px-2 py-1 text-xs rounded text-muted-foreground bg-muted hover:bg-muted/90">
-                      {note.is_public ? 'Make Private' : 'Make Public'}
+
+                    <button
+                      onClick={() => handleTogglePublic(note.id, note.is_public || false)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-700 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      {note.is_public ? (
+                        <>
+                          <Lock className="w-3.5 h-3.5" />
+                          Make Private
+                        </>
+                      ) : (
+                        <>
+                          <Globe className="w-3.5 h-3.5" />
+                          Make Public
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
               </div>
+
+              {/* Hover Effect Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none rounded-xl"></div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="mt-4 text-muted-foreground">You have no notes yet. Create one above!</p>
+        <div className="text-center py-16">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+            <FileText className="w-8 h-8 text-muted-foreground" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-2">No notes yet</h3>
+          <p className="text-muted-foreground max-w-sm mx-auto">
+            Create your first note or scribble above to get started organizing your thoughts.
+          </p>
+        </div>
       )}
     </div>
-  );
+  )
 }
